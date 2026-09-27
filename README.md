@@ -3,7 +3,7 @@ gemma 4 31b h ARA local deployment
 # Local LLM Deployment Protocol — Gemma 4 31B on RTX 5070
 
 Host: `falkor` (Ryzen 7 9700X, RTX 5070 12 GB, 64 GB DDR5-6000, Ubuntu 26.04)
-Model: `google/gemma-4-31B-it-qat-q4_0-gguf` @ commit `59dde24573e7e61570dba08b18a2e1fe246955ed`
+Model: `google/gemma-4-31B-it-qat-q4_0-gguf`
 Scripts: `fetch-model.sh`, `llm-serve.sh`, `llmwatch.py`
 
 ---
