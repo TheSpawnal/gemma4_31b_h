@@ -9,9 +9,10 @@ umask 077
 
 ROOT="${ROOT:-$HOME/llm}"
 BIN="${BIN:-$ROOT/llama.cpp/build/bin/llama-server}"
-MODEL_DIR="${MODEL_DIR:-$ROOT/models/gemma-4-31b-it-qat-q4_0}"
-MODEL="$MODEL_DIR/gemma-4-31B_q4_0-it.gguf"
-MMPROJ="$MODEL_DIR/gemma-4-31B-it-mmproj.gguf"
+MODEL_DIR="${MODEL_DIR:-$ROOT/models/gemma-4-31b-it-heretic}"
+QUANT="${QUANT:-Q4_K_M}"
+MODEL="$MODEL_DIR/gemma-4-31b-it-heretic-${QUANT}.gguf"
+MMPROJ="$MODEL_DIR/mmproj.gguf"
 KEYFILE="$ROOT/api.key"
 HDRFILE="$ROOT/auth.hdr"
 LOGDIR="$ROOT/logs"
@@ -23,7 +24,7 @@ THREADS="${THREADS:-8}"              # physical cores; decode is bandwidth-bound
 FIT_TARGET_MIB="${FIT_TARGET_MIB:-1536}" # VRAM left free for the desktop; 512 if display runs on the iGPU
 MEM_HIGH="${MEM_HIGH:-18G}"
 MEM_MAX="${MEM_MAX:-20G}"
-VISION="${VISION:-0}"                # 1 = load mmproj, kept on CPU (no VRAM cost)
+VISION="${VISION:-0}"                # 1 = load mmproj (only if you built one; text-only by default)
 THINK="${THINK:-false}"              # server default; per-request override via chat_template_kwargs
 VERIFY="${VERIFY:-1}"
 
@@ -98,7 +99,7 @@ unset key
 # ---- server arguments
 LOG="$LOGDIR/llama-server-$(date +%Y%m%dT%H%M%S).log"
 args=(
-    -m "$MODEL" --alias gemma-4-31b-it-qat
+    -m "$MODEL" --alias gemma-4-31b-it-heretic
     --host "$HOST" --port "$PORT" --api-key-file "$KEYFILE"
     -c "$CTX" -np 1
     -t "$THREADS" -tb "$THREADS"
@@ -118,6 +119,6 @@ echo "host:   vram free ${vram_free}M gpu ${gpu_temp}C ram avail ${avail_mib}M"
 echo "api:    http://$HOST:$PORT  (curl -H @$HDRFILE)"
 echo "log:    $LOG"
 
-exec systemd-run --user --scope --quiet --collect --unit="llm-gemma31b-$PORT" \
+exec systemd-run --user --scope --quiet --collect --unit="llm-heretic-$PORT" \
     -p MemoryHigh="$MEM_HIGH" -p MemoryMax="$MEM_MAX" -p MemorySwapMax=0 \
     -- "$BIN" "${args[@]}"
